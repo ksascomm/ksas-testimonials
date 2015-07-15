@@ -124,6 +124,16 @@ $testimonialdetails_1_metabox = array(
 	'priority' => 'default',
 	'fields' => array(
 
+				array(
+					'name' 			=> 'Last Name (For Indexing)',
+					'desc' 			=> '',
+					'id' 			=> 'ecpt_testimonial_alpha',
+					'class' 		=> 'ecpt_testimonial_alpha',
+					'type' 			=> 'text',
+					'rich_editor' 	=> 0,			
+					'max' 			=> 0,
+					'std'			=> ''													
+				),
 				
 				array(
 					'name' 			=> 'Class of',
