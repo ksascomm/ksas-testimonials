@@ -37,15 +37,17 @@ License: GPL2
 			'query_var'			=> true,
 			'capability_type'   => 'testimonial',
 			'capabilities' => array(
-				'publish_posts' => 'publish_testimonials',
 				'edit_posts' => 'edit_testimonials',
 				'edit_others_posts' => 'edit_others_testimonials',
-				'delete_posts' => 'delete_testimonials',
-				'delete_others_posts' => 'delete_others_testimonials',
+				'publish_posts' => 'publish_testimonials',
 				'read_private_posts' => 'read_private_testimonials',
-				'edit_post' => 'edit_testimonial',
-				'delete_post' => 'delete_testimonial',
+				'delete_posts' => 'delete_testimonials',
+				'delete_private_posts' => 'delete_private_testimonials',
+				'delete_others_posts' => 'delete_others_testimonials',
+				'edit_private_post' => 'edit_private_testimonials',
+				'edit_published_post' => 'edit_published_testimonials',
 				'read_post' => 'read_testimonial',),			
+			'map_meta_cap' => true,
 			'has_archive' 		=> false,
 			'hierarchical' 		=> false,
 			'rewrite' 			=> array('slug' => 'testimonial', 'with_front' => false ),
@@ -83,6 +85,7 @@ function register_testimonialtype_tax() {
 		'show_tagcloud' 	=> false,
 		'show_in_nav_menus' => false,
 		'rewrite' 			=> array('slug' => 'testimonialtype', 'with_front' => false ),
+		'capabilities' => array('assign_terms'=>'edit_testimonials')
 	 );
 	register_taxonomy('testimonialtype', $pages, $args);
 }
