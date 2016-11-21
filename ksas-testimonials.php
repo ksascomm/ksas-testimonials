@@ -290,9 +290,6 @@ function ecpt_testimonialdetails_1_save($post_id) {
 		}
 	}
 }
-//Configuring Admin Columns - in View all testimonial
-add_action("manage_posts_custom_column",  "testimonial_custom_columns");
-add_filter("manage_edit-testimonial_columns", "testimonial_edit_columns");
  
 function testimonial_edit_columns($columns){
   $columns = array(
@@ -313,5 +310,131 @@ function testimonial_custom_columns($column){
       break;
   }
 }
+
+//register widgets
+class Testimonial_Widget extends WP_Widget {
+	function Testimonial_Widget() {
+		$widget_options = array( 'classname' => 'ksas_testimonial', 'description' => __('Displays a random testimonial', 'ksas_testimonial') );
+		$control_options = array( 'width' => 300, 'height' => 350, 'id_base' => 'ksas_testimonial-widget' );
+		parent::__construct( 'ksas_testimonial-widget', __('Testimonial', 'ksas_testimonial'), $widget_options, $control_options );
+	}
+	/* Widget Display */
+	function widget( $args, $instance ) {
+		extract( $args );
+
+		/* Our variables from the widget settings. */
+		$title = apply_filters('widget_title', $instance['title'] );
+		$category_choice = $instance['category_choice'];
+		$random = $instance['random'];
+		$age = $instance['age'];
+		$archive_link = $instance['link'];
+		echo $before_widget;
+
+		/* Display the widget title if one was input (before and after defined by themes). */
+		if ( $title )
+			echo $before_title . $title . $after_title;
+		// Create a new filtering function that will add our where clause to the query
+		global $post;
+		$testimonial_widget_query = new WP_Query(array(
+					'post_type' => 'testimonial',
+					'testimonialtype' => $category_choice,
+					'orderby' => $random,
+					'year' => $age,
+					'posts_per_page' => 1));
+					
+		if ( $testimonial_widget_query->have_posts() ) :  while ($testimonial_widget_query->have_posts()) : $testimonial_widget_query->the_post(); ?>
+				<article id="post-<?php the_ID(); ?>" class="row" role="article">	
+					<div class="small-12 columns">
+						
+						<?php if ( has_post_thumbnail()) { the_post_thumbnail('post-thumbnail',  array('class' => "alignleft circle")); } ?>
+
+						<h5><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
+
+						<?php if ( get_post_meta($post->ID, 'ecpt_job', true) ) : ?>
+							<p><strong><?php echo get_post_meta($post->ID, 'ecpt_job', true); ?></strong></p>
+						<?php endif; ?>
+
+						<?php if ( get_post_meta($post->ID, 'ecpt_internship', true) ) : ?>
+							<p><strong><?php echo get_post_meta($post->ID, 'ecpt_internship', true); ?></strong></p>
+						<?php endif; ?>
+
+						<p><?php if(get_post_meta($post->ID, 'ecpt_pull_quote', true)) { echo get_post_meta($post->ID, 'ecpt_pull_quote', true); } else { echo get_the_excerpt(); } ?>
+						</p>
+
+					</div>
+				</article>
+	<?php endwhile; ?>
+		<article>
+			<p><a href="<?php echo $archive_link;?>">View more Testimonials <span class="fa fa-chevron-circle-right" aria-hidden="true"></span></a></p>
+		</article>
+	<?php endif; ?>
+ <?php echo $after_widget;
+	}
+
+	/* Update/Save the widget settings. */
+	function update( $new_instance, $old_instance ) {
+		$instance = $old_instance;
+
+		/* Strip tags for title and name to remove HTML (important for text inputs). */
+		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['category_choice'] = $new_instance['category_choice'];
+		$instance['random'] = strip_tags($new_instance['random']);
+		$instance['age'] = strip_tags($new_instance['age']);
+		$instance['link'] = $new_instance['link'];
+
+		return $instance;
+	}
+
+	/* Widget Options */
+	function form( $instance ) {
+
+		/* Set up some default widget settings. */
+		$defaults = array( 'title' => __('Testimonial', 'ksas_testimonial'), 'category_choice' => '1', 'random' => 'rand', 'age' => '' );
+		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
+
+		<!-- Widget Title: Text Input -->
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', 'hybrid'); ?></label>
+			<input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" style="width:100%;" />
+		</p>
+
+		<!-- Choose Testimonial Type: Select Box -->
+		<p>
+			<label for="<?php echo $this->get_field_id( 'category_choice' ); ?>"><?php _e('Choose Testimonial Type:', 'ksas_testimonial'); ?></label> 
+			<select id="<?php echo $this->get_field_id( 'category_choice' ); ?>" name="<?php echo $this->get_field_name( 'category_choice' ); ?>" class="widefat" style="width:100%;">
+			<?php global $wpdb;
+				$categories = get_categories(array(
+								'orderby'                  => 'name',
+								'order'                    => 'ASC',
+								'hide_empty'               => 1,
+								'taxonomy' => 'testimonialtype'));
+		    foreach($categories as $category) {
+		    	$category_choice = $category->slug;
+		        $category_title = $category->name; ?>
+		       <option value="<?php echo $category_choice; ?>" <?php if ( $category_choice == $instance['category_choice'] ) echo 'selected="selected"'; ?>><?php echo $category_title; ?></option>
+		    <?php } ?>
+			</select>
+		</p>
+
+		<!-- Widget Link: Archive Link -->
+		<p>
+			<label for="<?php echo $this->get_field_id( 'link' ); ?>"><?php _e('Link to Testimonial Type Archive:', 'hybrid'); ?></label>
+			<input id="<?php echo $this->get_field_id( 'link' ); ?>" name="<?php echo $this->get_field_name( 'link' ); ?>" value="<?php echo $instance['link']; ?>" style="width:100%;" />
+		</p>
+		
+		<p>
+			<label for="<?php echo $this->get_field_id( 'random' ); ?>"><?php _e('Order (Latest or Random)', 'ksas_testimonial'); ?></label>
+			<select id="<?php echo $this->get_field_id( 'random' ); ?>" name="<?php echo $this->get_field_name( 'random' ); ?>" class="widefat" style="width:100%;">
+			<option value="date" <?php if ( 'date' === $instance['random'] ) echo 'selected="selected"'; ?>>Latest Only</option>
+			<option value="rand" <?php if ( 'rand' === $instance['random'] ) echo 'selected="selected"'; ?>>Random</option>
+			</select>
+		</p>
+
+	<?php }
+}
+add_action('widgets_init', 'ksas_register_testimonial_widgets');
+	function ksas_register_testimonial_widgets() {
+		register_widget('Testimonial_Widget');
+	}
 
 ?>
