@@ -358,7 +358,7 @@ class Testimonial_Widget extends WP_Widget {
 							<p><strong><?php echo get_post_meta($post->ID, 'ecpt_internship', true); ?></strong></p>
 						<?php endif; ?>
 
-						<p><?php if(get_post_meta($post->ID, 'ecpt_pull_quote', true)) { echo get_post_meta($post->ID, 'ecpt_pull_quote', true); } else { echo get_the_excerpt(); } ?>
+						<p><?php if(get_post_meta($post->ID, 'ecpt_quote', true)) { echo get_post_meta($post->ID, 'ecpt_quote', true); } else { echo get_the_excerpt(); } ?>
 						</p>
 
 					</div>
