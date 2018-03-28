@@ -343,29 +343,29 @@ class Testimonial_Widget extends WP_Widget {
 					'posts_per_page' => 1));
 					
 		if ( $testimonial_widget_query->have_posts() ) :  while ($testimonial_widget_query->have_posts()) : $testimonial_widget_query->the_post(); ?>
-				<article id="post-<?php the_ID(); ?>" class="row" role="article">	
+				<article aria-labelledby="post-<?php the_ID(); ?>" class="row">	
 					<div class="small-12 columns">
 						
-						<?php if ( has_post_thumbnail()) { the_post_thumbnail('post-thumbnail',  array('class' => "alignleft circle")); } ?>
+						<?php if ( has_post_thumbnail()) { the_post_thumbnail('post-thumbnail',  array('class' => "alignleft circle", 'alt' => get_the_title())); } ?>
 
-						<h5><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
+						<h5 class="testimonial-bio-details"><a href="<?php the_permalink(); ?>" id="post-<?php the_ID(); ?>"><?php the_title(); ?><span class="link"></span></a></h5>
 
 						<?php if ( get_post_meta($post->ID, 'ecpt_job', true) ) : ?>
-							<p><strong><?php echo get_post_meta($post->ID, 'ecpt_job', true); ?></strong></p>
+							<p class="testimonial-job-details"><strong><?php echo get_post_meta($post->ID, 'ecpt_job', true); ?></strong></p>
 						<?php endif; ?>
 
 						<?php if ( get_post_meta($post->ID, 'ecpt_internship', true) ) : ?>
-							<p><strong><?php echo get_post_meta($post->ID, 'ecpt_internship', true); ?></strong></p>
+							<p class="testimonial-internship-details"><strong><?php echo get_post_meta($post->ID, 'ecpt_internship', true); ?></strong></p>
 						<?php endif; ?>
 
-						<p><?php if(get_post_meta($post->ID, 'ecpt_quote', true)) { echo get_post_meta($post->ID, 'ecpt_quote', true); } else { echo get_the_excerpt(); } ?>
+						<p class="testimonial-quote"><?php if(get_post_meta($post->ID, 'ecpt_quote', true)) { echo get_post_meta($post->ID, 'ecpt_quote', true); } else { echo get_the_excerpt(); } ?>
 						</p>
 
 					</div>
 				</article>
 	<?php endwhile; ?>
-		<article>
-			<p><a href="<?php echo $archive_link;?>">View more Testimonials <span class="fa fa-chevron-circle-right" aria-hidden="true"></span></a></p>
+		<article aria-label="testimonial archives">
+			<p class="view-more-link"><a href="<?php echo $archive_link;?>">View more Testimonials <span class="fa fa-chevron-circle-right" aria-hidden="true"></span></a></p>
 		</article>
 	<?php endif; ?>
  <?php echo $after_widget;
