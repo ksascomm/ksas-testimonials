@@ -73,7 +73,6 @@ function register_testimonialtype_tax() {
 		'show_tagcloud' 	=> false,
 		'show_in_nav_menus' => false,
 		'rewrite' 			=> array('slug' => 'testimonialtype', 'with_front' => false ),
-		'capabilities' => array('assign_terms'=>'edit_testimonials')
 	 );
 	register_taxonomy('testimonialtype', $pages, $args);
 }
