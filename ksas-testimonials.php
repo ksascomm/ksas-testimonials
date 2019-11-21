@@ -35,19 +35,7 @@ License: GPL2
 			'show_ui' 			=> true,
 			'publicly_queryable'=> true,
 			'query_var'			=> true,
-			'capability_type'   => 'testimonial',
-			'capabilities' => array(
-				'edit_posts' => 'edit_testimonials',
-				'edit_others_posts' => 'edit_others_testimonials',
-				'publish_posts' => 'publish_testimonials',
-				'read_private_posts' => 'read_private_testimonials',
-				'delete_posts' => 'delete_testimonials',
-				'delete_private_posts' => 'delete_private_testimonials',
-				'delete_others_posts' => 'delete_others_testimonials',
-				'edit_private_post' => 'edit_private_testimonials',
-				'edit_published_post' => 'edit_published_testimonials',
-				'read_post' => 'read_testimonial',),			
-			'map_meta_cap' => true,
+			'capability_type'   => 'post',			
 			'has_archive' 		=> false,
 			'hierarchical' 		=> false,
 			'rewrite' 			=> array('slug' => 'testimonial', 'with_front' => false ),
@@ -408,12 +396,12 @@ class Testimonial_Widget extends WP_Widget {
 					'posts_per_page' => 1));
 					
 		if ( $testimonial_widget_query->have_posts() ) :  while ($testimonial_widget_query->have_posts()) : $testimonial_widget_query->the_post(); ?>
-				<article aria-labelledby="post-<?php the_ID(); ?>" class="row">	
+				<article aria-labelledby="widget-title-<?php the_ID(); ?>" class="row">	
 					<div class="small-12 columns">
 						
 						<?php if ( has_post_thumbnail()) { the_post_thumbnail('post-thumbnail',  array('class' => "alignleft circle", 'alt' => get_the_title())); } ?>
 						<?php if( ! empty( $post->post_title ) ) : ?>
-							<h5 class="testimonial-bio-details"><a href="<?php the_permalink(); ?>" id="post-<?php the_ID(); ?>"><?php the_title(); ?><span class="link"></span></a></h5>
+							<h5 class="testimonial-bio-details"><a href="<?php the_permalink(); ?>" id="widget-title-<?php the_ID(); ?>"><?php the_title(); ?><span class="link"></span></a></h5>
 						<?php endif;?>
 
 						<?php if ( get_post_meta($post->ID, 'ecpt_job', true) ) : ?>
