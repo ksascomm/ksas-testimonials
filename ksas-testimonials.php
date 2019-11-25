@@ -24,7 +24,7 @@ License: GPL2
 			'parent_item_colon' => ''
 		);
 		
-		$taxonomies = array('testimonialtype');
+		$taxonomies = array('category');
 		
 		$supports = array('title','editor','revisions', 'thumbnail');
 		
@@ -277,26 +277,105 @@ function ecpt_testimonialdetails_1_save($post_id) {
 		}
 	}
 }
+
+add_filter( 'manage_edit-testimonial_columns', 'my_edit_testimonial_columns' ) ;
  
-function testimonial_edit_columns($columns){
+function my_edit_testimonial_columns($columns){
   $columns = array(
     "cb" => "<input type=\"checkbox\" />",
-    "title" => "Name",
-    "testimonialtype" => "Testimonial Type",
+	'title' => __( 'Name' ),
+	'testimonialtype' => __( 'Type' ),
+	'quote' => __('Excerpt'),
+	'thumbnail' => __('Thumbnail'),
+	'date' => __( 'Date' ),
   );
  
   return $columns;
 }
-function testimonial_custom_columns($column){
-  global $post;
- 
-  switch ($column) {
-  
-  case "testimonialtype":
-      echo get_the_term_list($post->ID, 'testimonialtype', '', ', ','');
-      break;
-  }
+
+
+add_action( 'manage_testimonial_posts_custom_column', 'my_manage_testimonial_columns', 10, 2 );
+function my_manage_testimonial_columns($column){
+	global $post;
+
+	switch( $column ) {
+
+		/* If displaying the 'role' column. */
+		case 'testimonialtype' :
+
+			/* Get the roles for the post. */
+			$terms = get_the_terms( $post_id, 'testimonialtype' );
+
+			/* If terms were found. */
+			if ( !empty( $terms ) ) {
+
+				$out = array();
+
+				/* Loop through each term, linking to the 'edit posts' page for the specific term. */
+				foreach ( $terms as $term ) {
+					$out[] = sprintf( '<a href="%s">%s</a>',
+						esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'testimonialtype' => $term->slug ), 'edit.php' ) ),
+						esc_html( sanitize_term_field( 'name', $term->name, $term->term_id, 'testimonialtype', 'display' ) )
+					);
+				}
+
+				/* Join the terms, separating them with a comma. */
+				echo join( ', ', $out );
+			}
+
+			/* If no terms were found, output a default message. */
+			else {
+				_e( 'No Type Assigned' );
+			}
+
+			break;
+		case 'quote' :
+			if (get_post_meta($post->ID, 'ecpt_quote', true)) {
+					echo get_post_meta($post->ID, 'ecpt_quote', true);
+			} else {
+				the_excerpt();
+			}
+		break;
+		case 'thumbnail' :
+			if ( has_post_thumbnail()) { 
+				the_post_thumbnail('directory');
+			} else {
+				echo __( 'No Photo' );
+			}
+			break;
+		/* Just break out of the switch statement for everything else. */
+		default :
+			break;
+	}
 }
+
+function testimonial_add_taxonomy_filters() {
+	global $typenow;
+
+	// An array of all the taxonomyies you want to display. Use the taxonomy name or slug
+	$taxonomies = array('testimonialtype', 'filter');
+ 
+	// must set this to the post type you want the filter(s) displayed on
+	if ( $typenow == 'testimonial' ) {
+ 
+		foreach ( $taxonomies as $tax_slug ) {
+			$current_tax_slug = isset( $_GET[$tax_slug] ) ? $_GET[$tax_slug] : false;
+			$tax_obj = get_taxonomy( $tax_slug );
+			$tax_name = $tax_obj->labels->name;
+			$terms = get_terms($tax_slug);
+			if ( count( $terms ) > 0) {
+				echo "<select name='$tax_slug' id='$tax_slug' class='postform'>";
+				echo "<option value=''>$tax_name</option>";
+				foreach ( $terms as $term ) {
+					echo '<option value=' . $term->slug, $current_tax_slug == $term->slug ? ' selected="selected"' : '','>' . $term->name .' (' . $term->count .')</option>';
+				}
+				echo "</select>";
+			}
+		}
+	}
+}
+
+add_action( 'restrict_manage_posts', 'testimonial_add_taxonomy_filters' );
 
 /*************Testimonial Widget*****************/
 // Define Testimonial widget
@@ -326,7 +405,7 @@ class Testimonial_Widget extends WP_Widget {
 	public function form( $instance ) {
 
 		/* Set up some default widget settings. */
-		$defaults = array( 'title' => __('Testimonial', 'ksas_testimonial'), 'category_choice' => '1', 'random' => 'rand', 'age' => '' );
+		$defaults = array( 'title' => __('Testimonial', 'ksas_testimonial'), 'category_choice' => '1', 'random' => 'rand', 'link' => '' );
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
 
 		<!-- Widget Title: Text Input -->
@@ -348,7 +427,9 @@ class Testimonial_Widget extends WP_Widget {
 		    foreach($categories as $category) {
 		    	$category_choice = $category->slug;
 		        $category_title = $category->name; ?>
-		       <option value="<?php echo $category_choice; ?>" <?php if ( $category_choice == $instance['category_choice'] ) echo 'selected="selected"'; ?><?php echo $category_title; ?></option>
+		       <option value="<?php echo $category_choice; ?>"<?php if ( $category_choice == $instance['category_choice'] ) echo 'selected="selected"'; ?>>
+		       		<?php echo $category_title; ?>
+				</option>
 		    <?php } ?>
 			</select>
 		</p>
