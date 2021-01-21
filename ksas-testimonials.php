@@ -476,10 +476,8 @@ class Testimonial_Widget extends WP_Widget {
 					'posts_per_page' => 1));
 					
 		if ( $testimonial_widget_query->have_posts() ) :  while ($testimonial_widget_query->have_posts()) : $testimonial_widget_query->the_post(); ?>
-				<article aria-labelledby="widget-title-<?php the_ID(); ?>" class="row">	
-					<div class="small-12 columns">
-						
-						<?php if ( has_post_thumbnail()) { the_post_thumbnail('post-thumbnail',  array('class' => "alignleft circle", 'alt' => get_the_title())); } ?>
+				<article aria-labelledby="widget-title-<?php the_ID(); ?>">							
+						<?php if ( has_post_thumbnail()) { the_post_thumbnail('large',  array('class' => "aligncenter", 'alt' => get_the_title())); } ?>
 						<?php if( ! empty( $post->post_title ) ) : ?>
 							<h5 class="testimonial-bio-details"><a href="<?php the_permalink(); ?>" id="widget-title-<?php the_ID(); ?>"><?php the_title(); ?><span class="link"></span></a></h5>
 						<?php endif;?>
@@ -494,8 +492,6 @@ class Testimonial_Widget extends WP_Widget {
 
 						<p class="testimonial-quote"><?php if(get_post_meta($post->ID, 'ecpt_quote', true)) { echo get_post_meta($post->ID, 'ecpt_quote', true); } else { echo get_the_excerpt(); } ?>
 						</p>
-
-					</div>
 				</article>
 	<?php endwhile; ?>
 		<article aria-label="<?php echo $category_choice ;?> archives">
