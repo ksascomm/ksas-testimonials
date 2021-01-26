@@ -463,7 +463,7 @@ class Testimonial_Widget extends WP_Widget {
 						'order'      => 'ASC',
 						'hide_empty' => 1,
 						'taxonomy'   => 'testimonialtype',
-					),
+					)
 				);
 			foreach ( $categories as $category ) {
 				$category_choice = $category->slug;
