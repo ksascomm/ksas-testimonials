@@ -217,30 +217,14 @@ function ecpt_show_testimonialdetails_1_box() {
 				break;
 			case 'textarea':
 				if ( $field['rich_editor'] == 1 ) {
-					if ( $wp_version >= 3.3 ) {
-						echo wp_editor(
-							$meta,
-							$field['id'],
-							array(
-								'textarea_name' => $field['id'],
-								'wpautop'       => false,
-							)
-						);
-					} else {
-						// older versions of WP.
-						$editor = '';
-						if ( ! post_type_supports( $post->post_type, 'editor' ) ) {
-							$editor = wp_editor(
-								true,
-								array(
-									'editor_selector'   => $field['class'],
-									'remove_linebreaks' => false,
-								)
-							);
-						}
-						$field_html = '<div style="width: 97%; border: 1px solid #DFDFDF;"><textarea name="' . $field['id'] . '" class="' . $field['class'] . '" id="' . $field['id'] . '" cols="60" rows="8" style="width:100%">' . $meta . '</textarea></div><br/>' . __( $field['desc'] );
-						echo $editor . $field_html;
-					}
+					echo wp_editor(
+						$meta,
+						$field['id'],
+						array(
+							'textarea_name' => $field['id'],
+							'wpautop'       => false,
+						)
+					);
 				} else {
 					echo '<div style="width: 100%;"><textarea name="', $field['id'], '" class="', $field['class'], '" id="', $field['id'], '" cols="60" rows="8" style="width:97%">', $meta ? $meta : $field['std'], '</textarea></div>', '', $field['desc'];
 				}
